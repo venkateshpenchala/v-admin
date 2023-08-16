@@ -50,6 +50,11 @@
       white-space: nowrap;
       text-decoration: none;
     }
+
+    .logo img {
+      height: auto;
+      max-width: 100%;
+    }
   }
 
   @include media-breakpoint-down(sm) {
