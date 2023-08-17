@@ -1,6 +1,5 @@
 import { NgModule } from "@angular/core";
 import { ThemeModule } from "../../@theme/theme.module";
-import { ChartsRoutingModule } from "../charts/charts-routing.module";
 import { NgxEchartsModule } from "ngx-echarts";
 import { NgxChartsModule } from "@swimlane/ngx-charts";
 import { ChartModule } from "angular2-chartjs";
@@ -19,7 +18,6 @@ const components = [
 @NgModule({
   imports: [
     ThemeModule,
-    ChartsRoutingModule,
     NgxEchartsModule,
     NgxChartsModule,
     ChartModule,
