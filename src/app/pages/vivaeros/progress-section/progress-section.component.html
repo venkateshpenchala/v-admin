@@ -1,8 +1,8 @@
-<nb-card size="medium">
+<nb-card>
   <nb-card-body>
     <div class="progress-info" *ngFor="let item of progressInfoData">
       <div class="subtitle">{{ item.title }}</div>
-      <div class="h3">{{ item.value | ngxNumberWithCommas }}</div>
+      <div class="h3">{{ item.value | ngxNumberWithCommas }} €</div>
       <nb-progress-bar [value]="item.activeProgress"></nb-progress-bar>
       <div class="caption description">
         <bdi>{{ item.description }}</bdi>
