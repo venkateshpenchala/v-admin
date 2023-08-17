@@ -29,7 +29,8 @@ export class VivaerosPieComponent implements AfterViewInit, OnDestroy {
           formatter: '{a} <br/>{b} : {c} ({d}%)',
         },
         title: {
-          text: `5555 €`,
+          text: `800 €`,
+          fontSize: 80,
           left: 'center',
           top: 'center',
           textStyle: {

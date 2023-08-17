@@ -8,13 +8,13 @@ export class StatsProgressBarService extends StatsProgressBarData {
     {
       title: 'Today’s Profit',
       value: 800,
-      activeProgress: 70,
+      isCurrency: true,
       description: 'Better than last week (70%)',
     },
     {
       title: 'This month Forecast',
       value: 6378,
-      activeProgress: 30,
+      isCurrency: true,
       description: 'Better than last week (30%)',
     }
   ];
