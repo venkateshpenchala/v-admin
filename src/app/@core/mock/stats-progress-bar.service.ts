@@ -7,13 +7,13 @@ export class StatsProgressBarService extends StatsProgressBarData {
   private progressInfoData: ProgressInfo[] = [
     {
       title: 'Today’s Profit',
-      value: 800,
+      value: '800',
       isCurrency: true,
       description: 'Better than last week (70%)',
     },
     {
       title: 'This month Forecast',
-      value: 6378,
+      value: '6378',
       isCurrency: true,
       description: 'Better than last week (30%)',
     }

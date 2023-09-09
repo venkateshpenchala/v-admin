@@ -1,21 +1,30 @@
-import { AfterViewInit, Component, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { NbThemeService } from '@nebular/theme';
+import * as echarts from 'echarts';
+import { Vivaeros } from '../models/vivaeros';
 
 @Component({
   selector: 'echarts-pie',
   template: `
-    <div echarts [options]="options" class="echart"></div>
+    <div echarts #piechart [options]="options" id="pieChart" class="echart" style="height: 700px;" ></div>
   `,
 })
 
 export class VivaerosPieComponent implements AfterViewInit, OnDestroy {
   options: any = {};
   themeSubscription: any;
+  myChart: echarts.ECharts;
 
   constructor(private theme: NbThemeService) {
   }
 
+  @Input() sum:number;
+  @Input() chartData;
+
   ngAfterViewInit() {
+    let chartElement = document.getElementById('pieChart');
+    this.myChart = echarts.init(chartElement);
+
     this.themeSubscription = this.theme.getJsTheme().subscribe(config => {
 
       const colors = config.variables;
@@ -28,26 +37,18 @@ export class VivaerosPieComponent implements AfterViewInit, OnDestroy {
           trigger: 'item',
           formatter: '{a} <br/>{b} : {c} ({d}%)',
         },
-        title: {
-          text: `800 €`,
-          fontSize: 80,
-          left: 'center',
-          top: 'center',
-          textStyle: {
-              color: echarts.textColor
-          }
+        legend: {
+          orient: 'vertical',
+          left: 'left'
         },
         series: [
           {
-            name: 'Countries',
+            name: 'Vivaeros',
             type: 'pie',
-            radius: ['40%', '70%'],
+            radius: ['60%', '80%'],
             avoidLabelOverlap: false,
-            data: [
-              { value: 335, name: 'Va Original' },
-              { value: 310, name: 'Va Mature' },
-              { value: 234, name: 'Va P' }
-            ],
+            data: this.chartData,
+            color: ['#000', '#FF0000', '#5A5A5A'],
             itemStyle: {
               emphasis: {
                 shadowBlur: 10,
@@ -61,15 +62,16 @@ export class VivaerosPieComponent implements AfterViewInit, OnDestroy {
             label: {
               show: true,
               position: 'center',
-              normal: {
-                textStyle: {
-                  color: echarts.textColor,
-                },
+              fontSize: '80',
+              fontWeight:'bold',
+              formatter: () => {
+                return this.sum+ '€'; // Use sum variable here
               },
+              color: echarts.textColor
             },
             emphasis: {
               label: {
-                show: true,
+                show: false,
                 fontSize: 40,
                 fontWeight: 'bold'
               }
@@ -78,6 +80,18 @@ export class VivaerosPieComponent implements AfterViewInit, OnDestroy {
         ],
       };
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.sum && changes.sum.currentValue) {
+      this.myChart.setOption({
+        series: [
+          {
+            data: this.chartData
+          }
+        ]
+      }, false);
+    }
   }
 
   ngOnDestroy(): void {

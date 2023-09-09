@@ -2,7 +2,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
 
 import { PagesComponent } from './pages.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { NotFoundComponent } from './miscellaneous/not-found/not-found.component';
 import { VivaerosDashboardComponent } from './vivaeros/vivaeros.component';
 
@@ -13,10 +12,6 @@ const routes: Routes = [{
     {
       path: 'vivaeros',
       component: VivaerosDashboardComponent,
-    },
-    {
-      path: 'iot-dashboard',
-      component: DashboardComponent,
     },
     {
       path: '',

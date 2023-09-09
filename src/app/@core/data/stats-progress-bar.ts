@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 
 export interface ProgressInfo {
   title: string;
-  value: number;
+  value: string;
   isCurrency: boolean;
   description: string;
 }

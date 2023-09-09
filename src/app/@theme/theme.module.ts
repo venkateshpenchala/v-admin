@@ -74,6 +74,7 @@ const PIPES = [
   imports: [CommonModule, ...NB_MODULES],
   exports: [CommonModule, ...PIPES, ...COMPONENTS],
   declarations: [...COMPONENTS, ...PIPES],
+  providers: [NumberWithCommasPipe]
 })
 export class ThemeModule {
   static forRoot(): ModuleWithProviders<ThemeModule> {

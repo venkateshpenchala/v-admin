@@ -1,30 +1,41 @@
 <div class="row">
   <div class="col-xxxl-8 col-md-8">
     <nb-card>
-      <nb-card-header>Pie</nb-card-header>
       <nb-card-body>
-        <echarts-pie></echarts-pie>
+        <echarts-pie
+        [sum]="sum"
+        [chartData]="chartData"></echarts-pie>
       </nb-card-body>
     </nb-card>
   </div>
 
   <div class="col-xxxl-4 col-md-4">
-    <nb-card>
-      <nb-card-header>Bar</nb-card-header>
-      <nb-card-body>
-        <echarts-bar></echarts-bar>
-      </nb-card-body>
-    </nb-card>
+    <div class="row">
+      <div class="col-xxxl-12 col-md-12">
+        <nb-card>
+          <nb-card-body>
+            <echarts-bar
+            [barChartData]="barChartData"></echarts-bar>
+          </nb-card-body>
+        </nb-card>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xxxl-12 col-md-12">
+        <ngx-progress-section [progressInfoData] = progressInfoData></ngx-progress-section>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <div class="row">
-  <div class="col-xxl-3">
-    <ngx-progress-section [progressInfoData] = progressInfoData></ngx-progress-section>
-    <ngx-progress-section [progressInfoData] = webhits></ngx-progress-section>
+  <div class="col-xxl-12">
+    <ngx-country-orders></ngx-country-orders>
   </div>
 
-  <div class="col-xxl-9">
-    <ngx-country-orders></ngx-country-orders>
+  <div class="col-xxl-3">
+    <ngx-progress-section [progressInfoData] = webhits></ngx-progress-section>
   </div>
 </div>
