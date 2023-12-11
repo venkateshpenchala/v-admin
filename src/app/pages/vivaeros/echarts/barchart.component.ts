@@ -5,7 +5,7 @@ import * as echarts from 'echarts';
 @Component({
   selector: 'echarts-bar',
   template: `
-    <div echarts [options]="options" id="barChart" class="echart" style="height: 426px;"></div>
+    <div echarts [options]="options" id="barChart" class="echart" style="height: 444px;"></div>
   `,
 })
 export class VivaerosBarComponent implements AfterViewInit, OnDestroy {
@@ -45,7 +45,7 @@ export class VivaerosBarComponent implements AfterViewInit, OnDestroy {
         xAxis: [
           {
             type: 'category',
-            data: ['Va Original', 'Va Mature', 'Va P'],
+            data: ['', '', ''],
             axisTick: {
               alignWithLabel: true,
             },
@@ -83,17 +83,13 @@ export class VivaerosBarComponent implements AfterViewInit, OnDestroy {
         ],
         series: [
           {
-            name: 'Order Value',
+            name: '',
             type: 'bar',
             barWidth: '60%',
             data: this.barChartData,
-            label: {
-              show: true,
-              position: 'inside'
-            },
             itemStyle: {
               color: function(params) {
-                var colorList = ['#000', '#FF0000', '#5A5A5A'];
+                var colorList = ['#000', '#FF0000', '#6E6E6E'];
                 return colorList[params.dataIndex];
               }
             }

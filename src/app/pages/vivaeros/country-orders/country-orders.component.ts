@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { NbMediaBreakpoint, NbMediaBreakpointsService, NbThemeService } from '@nebular/theme';
 import { takeWhile } from 'rxjs/operators';
 import { CountryOrderData } from '../../../@core/data/country-order';
@@ -10,7 +10,8 @@ import { CountryOrderData } from '../../../@core/data/country-order';
     <nb-card [size]="breakpoint.width >= breakpoints.md ? 'giant' : 'giant'">
       <nb-card-body>
         <ngx-country-orders-map (selectEvent)="selectCountryById($event)"
-                                countryId="USA">
+                                countryId="USA"
+                                [activeUsersByCountry] = "activeUsersByCountry">
         </ngx-country-orders-map>
       </nb-card-body>
     </nb-card>
@@ -25,6 +26,8 @@ export class VivaerosCountryOrdersComponent implements OnInit, OnDestroy {
   countriesCategories: string[];
   breakpoint: NbMediaBreakpoint = { name: '', width: 0 };
   breakpoints: any;
+  @Input() activeUsersByCountry;
+  @Input() activeUsersByDevice;
 
   constructor(private themeService: NbThemeService,
               private breakpointService: NbMediaBreakpointsService,

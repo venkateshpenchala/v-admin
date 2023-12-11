@@ -20,6 +20,7 @@ export class VivaerosPieComponent implements AfterViewInit, OnDestroy {
 
   @Input() sum:number;
   @Input() chartData;
+  @Input() status;
 
   ngAfterViewInit() {
     let chartElement = document.getElementById('pieChart');
@@ -39,7 +40,11 @@ export class VivaerosPieComponent implements AfterViewInit, OnDestroy {
         },
         legend: {
           orient: 'vertical',
-          left: 'left'
+          left: 'left',
+          textStyle: {
+            fontSize: 14,
+            color: echarts.textColor
+          },
         },
         series: [
           {
@@ -77,7 +82,7 @@ export class VivaerosPieComponent implements AfterViewInit, OnDestroy {
               }
             },
           },
-        ],
+        ]
       };
     });
   }
@@ -90,6 +95,32 @@ export class VivaerosPieComponent implements AfterViewInit, OnDestroy {
             data: this.chartData
           }
         ]
+      }, false);
+    }
+
+    if(changes.status && changes.status.currentValue) {
+      let imgSrc = '';
+      if(changes.status.currentValue == 'Better') {
+        imgSrc = 'assets/images/chartup.png';
+      } else {
+        imgSrc = 'assets/images/chartdown.png';
+      }
+
+      this.myChart.setOption({
+        graphic: {
+          type: 'image',
+          id: 'logo',
+          left: 'center',
+          top: '400',
+          z: 10,
+          bounding: 'raw',
+          origin: [0, 75],
+          style: {
+            image: imgSrc, // your image or icon URL here
+            width: 100,
+            height: 100
+          }
+        }
       }, false);
     }
   }

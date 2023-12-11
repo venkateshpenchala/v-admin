@@ -8,6 +8,7 @@ $shadow-green: #00977e;
     flex-direction: column;
     justify-content: space-between;
     margin-top: 2rem;
+    font-size: 1.5rem !important;
 
     &:first-child {
       margin-top: 0;
@@ -16,5 +17,9 @@ $shadow-green: #00977e;
 
   .description {
     margin-top: 0.5rem;
+  }
+
+  .subtitle {
+    font-size: 1.2rem;
   }
 }

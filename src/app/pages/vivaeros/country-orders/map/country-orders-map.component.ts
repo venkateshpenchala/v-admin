@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output, SimpleChanges } from '@angular/core';
 
 import * as L from 'leaflet';
 
@@ -6,7 +6,6 @@ import { VivaerosCountryOrdersMapService } from './country-orders-map.service';
 import { NbThemeService } from '@nebular/theme';
 import { combineLatest } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
-
 
 @Component({
   selector: 'ngx-country-orders-map',
@@ -18,6 +17,7 @@ import { takeWhile } from 'rxjs/operators';
 export class VivaerosCountryOrdersMapComponent implements OnDestroy {
 
   @Input() countryId: string;
+  @Input() activeUsersByCountry;
 
   @Output() selectEvent: EventEmitter<any> = new EventEmitter();
 
@@ -25,6 +25,7 @@ export class VivaerosCountryOrdersMapComponent implements OnDestroy {
   currentTheme: any;
   alive = true;
   selectedCountry;
+  selectedFeatures: any[] = [];
 
   options = {
     zoom: 2,
@@ -50,7 +51,7 @@ export class VivaerosCountryOrdersMapComponent implements OnDestroy {
       .subscribe(([cords, config]: [any, any]) => {
         this.currentTheme = config.variables.countryOrders;
         this.layers = [this.createGeoJsonLayer(cords)];
-        this.selectFeature(this.findFeatureLayerByCountryId(this.countryId));
+        //this.selectFeature(this.findFeatureLayerByCountryId(this.countryId));
       });
   }
 
@@ -103,7 +104,7 @@ export class VivaerosCountryOrdersMapComponent implements OnDestroy {
   }
 
   private moveout(featureLayer) {
-    if (featureLayer !== this.selectedCountry) {
+    if (!this.selectedFeatures.includes(featureLayer)) {
       this.resetHighlight(featureLayer);
 
       // When countries have common border we should highlight selected country once again
@@ -120,10 +121,11 @@ export class VivaerosCountryOrdersMapComponent implements OnDestroy {
   }
 
   private selectFeature(featureLayer) {
-    if (featureLayer !== this.selectedCountry) {
-      this.resetHighlight(this.selectedCountry);
+    if (!this.selectedFeatures.includes(featureLayer)) {
+      //this.resetHighlight(this.selectedCountry);
       this.highlightFeature(featureLayer);
       this.selectedCountry = featureLayer;
+      this.selectedFeatures.push(featureLayer);
       this.selectEvent.emit(featureLayer.feature.properties.name);
     }
   }
@@ -131,7 +133,7 @@ export class VivaerosCountryOrdersMapComponent implements OnDestroy {
   private findFeatureLayerByCountryId(id) {
     const layers = this.layers[0].getLayers();
     const featureLayer = layers.find(item => {
-      return item.feature.id === id;
+      return item.feature.properties.name.includes(id);
     });
 
     return featureLayer ? featureLayer : null;
@@ -141,4 +143,22 @@ export class VivaerosCountryOrdersMapComponent implements OnDestroy {
     this.alive = false;
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes["activeUsersByCountry"] && changes["activeUsersByCountry"].currentValue) {
+      const countries: string[] = this.activeUsersByCountry.map(obj => obj.country);
+      if(countries.length >= 0) {
+        if(this.selectedFeatures.length >= 0) {
+          this.selectedFeatures.forEach(selectedFeature => {
+            this.resetHighlight(selectedFeature);
+          });
+        }
+        countries.forEach(country => {
+          let fl = this.findFeatureLayerByCountryId(country);
+          if(fl != null) {
+            this.selectFeature(fl);
+          }
+        });
+      }
+    }
+  }
 }

@@ -3,7 +3,7 @@ import { ThemeModule } from "../../@theme/theme.module";
 import { NgxEchartsModule } from "ngx-echarts";
 import { NgxChartsModule } from "@swimlane/ngx-charts";
 import { ChartModule } from "angular2-chartjs";
-import { NbCardModule } from "@nebular/theme";
+import { NbCardModule, NbListModule } from "@nebular/theme";
 import { VivaerosPieComponent } from "./echarts/piechart.component";
 import { VivaerosDashboardComponent } from "./vivaeros.component";
 import { VivaerosBarComponent } from "./echarts/barchart.component";
@@ -32,11 +32,12 @@ const components = [
     NgxChartsModule,
     ChartModule,
     NbCardModule,
-    LeafletModule,
+    NbListModule,
+    LeafletModule
   ],
   declarations: [ ...components],
   providers: [
-    VivaerosCountryOrdersMapService,
+    VivaerosCountryOrdersMapService
   ]
 })
 export class VivaerosModule {}

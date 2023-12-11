@@ -6,6 +6,7 @@ import * as echarts from 'echarts';
 import { VivaerosPieComponent } from "./echarts/piechart.component";
 import { Vivaeros } from "./models/vivaeros";
 
+
 @Component({
   selector: 'vivaeros-dashboard',
   styleUrls: ['./vivaeros.component.scss'],
@@ -30,7 +31,12 @@ export class VivaerosDashboardComponent implements OnDestroy {
 
   sum = '0';
   total = 0;
+  customTotal = 0;
+  monthlyTotal = 0;
   weekAgoTotal = 0;
+  VaONum = 0;
+  VaMNum = 0;
+  VaPNum = 0;
   VaM = 0;
   VaO = 0;
   VaP = 0;
@@ -38,39 +44,98 @@ export class VivaerosDashboardComponent implements OnDestroy {
   forecast = 0;
   percentageIncrease = 0;
   chartData: Vivaeros[] = [];
-  barChartData:number[] =[];
+  barChartData =[];
+  activeUsersByCountry = [];
+  activeUsersByDevice = [];
 
   get progressInfoData(): ProgressInfo[] {
     return [
       {
-        title: 'Today’s Profit',
-        value: this.sum,
+        title: 'This month',
+        value: this.monthlyTotal+'',
         isCurrency: true,
-        description: this.compareStr + ' than last week (' + this.percentageIncrease + '%)',
+        style: {"font-size": "38px"},
+        description: ''
       },
       {
-        title: 'This month Forecast',
-        value: this.forecast+'',
+        title: 'This month forecast',
+        value: Number(this.forecast.toFixed(2))+'',
         isCurrency: true,
+        style: {"color":"green", "font-size": "38px"},
         description: '',
       }
     ];
   }
 
+  get monthlyData(): ProgressInfo[] {
+    return [
+      {
+        title: 'This month',
+        value: this.monthlyTotal+'',
+        isCurrency: true,
+        style: {},
+        description: ''
+      }
+    ]
+  }
+
   webhits: ProgressInfo[] = [
     {
-      title: 'Today’s Web hits',
+      title: 'Today’s web hits',
       value: '1020',
       isCurrency: false,
+      style: {},
       description: '',
     },
     {
-      title: 'This month Web hits',
+      title: 'This month web hits',
       value: '12000',
+      style: {},
       isCurrency: false,
       description: '',
     }
   ];
+
+  ranking = [
+    'USA',
+    'India',
+    'Germany',
+    'China',
+    'Italy'
+  ];
+
+  shops = [
+    {
+      sum: 0,
+      shop: 'WooCommerce Shop'
+    },
+    {
+      sum: 0,
+      shop: 'e-Bay'
+    },
+    {
+      sum: 0,
+      shop: 'amazon europe'
+    },
+    {
+      sum: 0,
+      shop: 'amazon com'
+    },
+    {
+      sum: 0,
+      shop: 'Etsy'
+    },
+    {
+      sum: 0,
+      shop: 'Ebay NEU'
+    },
+    {
+      sum: 0,
+      shop: 'others'
+    }
+  ];
+
+  shopRanking = [];
 
   ngOnDestroy(): void {
   }
@@ -78,6 +143,10 @@ export class VivaerosDashboardComponent implements OnDestroy {
   ngAfterViewInit(): void {
     this.total = 0;
     this.GetOrderData();
+    this.GetGoogleCountriesData();
+    this.GetGoogleDeviceCategory();
+
+    this.InitiateConfigData();
 
     const stylesheet = document.styleSheets[0];
     stylesheet.insertRule('.nb-layout .layout { background-color: #dddfe4 !important;}', stylesheet.cssRules.length);
@@ -96,6 +165,7 @@ export class VivaerosDashboardComponent implements OnDestroy {
     this.GetOrdersWithPages(startOfTodayFormatted, endOfTodayFormatted, page);
 
     this.GetWeekAgoOrders();
+    // this.GetMonthlyOrder();
   }
 
   GetOrdersWithPages(startOfTodayFormatted, endOfTodayFormatted, page) {
@@ -103,37 +173,142 @@ export class VivaerosDashboardComponent implements OnDestroy {
       (data:any) => {
         if(data['Data'].length != 0) {
           let orderData = data['Data'];
+          this.VaMNum = 0;
+          this.VaONum = 0;
+          this.VaPNum = 0;
+          this.VaM = 0;
+          this.VaO = 0;
+          this.VaP = 0;
+          this.shopRanking = []
           orderData.forEach(order => {
-            this.total += (order['TotalCost'] - order['ShippingCost']);
+            let orderValue = (order['TotalCost'] - order['ShippingCost'])
+            this.total += orderValue;
             order['OrderItems'].forEach(item => {
               if(item['Product']['Title'].indexOf('Mature') > -1) {
                 this.VaM += item['TotalPrice'];
+                this.VaMNum++;
                 this.VaM =  Math.round(this.VaM * 100) / 100;
               }
               else if(item['Product']['Title'].indexOf('Original') > -1) {
                 this.VaO += item['TotalPrice'];
+                this.VaONum++;
                 this.VaO =  Math.round(this.VaO * 100) / 100;
               }
               else if(item['Product']['Title'].indexOf('Petite') > -1) {
                 this.VaP += item['TotalPrice'];
+                this.VaPNum++;
                 this.VaP =  Math.round(this.VaP * 100) / 100;
               }
             });
+
+
+            switch(order['Seller']['BillbeeShopName']) {
+              case 'WooCommerce Shop': {
+                const amazonEuropeShop = this.shops.find(shop => shop.shop === 'WooCommerce Shop');
+                if (amazonEuropeShop) {
+                  amazonEuropeShop.sum += orderValue;
+                }
+                break;
+              }
+              case 'e-Bay': {
+                const amazonEuropeShop = this.shops.find(shop => shop.shop === 'e-Bay');
+                if (amazonEuropeShop) {
+                  amazonEuropeShop.sum += orderValue;
+                }
+                break;
+              }
+              case 'amazon europe': {
+                const amazonEuropeShop = this.shops.find(shop => shop.shop === 'amazon europe');
+                if (amazonEuropeShop) {
+                  amazonEuropeShop.sum += orderValue;
+                }
+                break;
+              }
+              case 'amazon com': {
+                const amazonEuropeShop = this.shops.find(shop => shop.shop === 'amazon com');
+                if (amazonEuropeShop) {
+                  amazonEuropeShop.sum += orderValue;
+                }
+                break;
+              }
+              case 'Etsy': {
+                const amazonEuropeShop = this.shops.find(shop => shop.shop === 'Etsy');
+                if (amazonEuropeShop) {
+                  amazonEuropeShop.sum += orderValue;
+                }
+                break;
+              }
+              case 'Ebay NEU': {
+                const amazonEuropeShop = this.shops.find(shop => shop.shop === 'Ebay NEU');
+                if (amazonEuropeShop) {
+                  amazonEuropeShop.sum += orderValue;
+                }
+                break;
+              }
+              default: {
+                const amazonEuropeShop = this.shops.find(shop => shop.shop === 'others');
+                if (amazonEuropeShop) {
+                  amazonEuropeShop.sum += orderValue;
+                }
+                break;
+              }
+            }
           });
 
           if(data['Paging']['TotalPages'] > 1 && page < data['Paging']['TotalPages']) {
             page++;
             this.GetOrdersWithPages(startOfTodayFormatted, endOfTodayFormatted, page);
           }
+          this.shops = this.shops.sort((a, b) => b.sum - a.sum);
+          this.shops.forEach(shop => {
+            if(shop.sum != 0) {
+              this.shopRanking.push(shop);
+            }
+          });
         }
 
         this.chartData = [
-          {name: 'Va Original', value: this.VaO},
-          {name: 'Va Mature', value: this.VaM},
-          {name: 'Va P', value: this.VaP}
+          {name: 'VULVA Original', value: this.VaO},
+          {name: 'VULVA Mature', value: this.VaM},
+          {name: 'pedites original', value: this.VaP}
         ];
 
-        this.barChartData = [this.VaO, this.VaM, this.VaP];
+        // this.barChartData = [this.VaO, this.VaM, this.VaP];
+
+        this.barChartData = [{
+          value: this.VaO,
+          label: {
+            show: true,
+            position: 'inside',
+            fontSize: 22,
+            fontWeight: 'bold',
+            formatter: (params) => {
+              return params.value > 0 ? `${this.VaO}\n\n(${this.VaONum})` : '';
+            }
+        }
+        },{
+          value: this.VaM,
+          label: {
+            show: true,
+            position: 'inside',
+            fontSize: 22,
+            fontWeight: 'bold',
+            formatter: (params) => {
+              return params.value > 0 ? `${this.VaM}\n\n(${this.VaMNum})` : '';
+            }
+          }
+        }, {
+          value: this.VaP,
+          label: {
+            show: true,
+            position: 'inside',
+            fontSize: 22,
+            fontWeight: 'bold',
+            formatter: (params) => {
+              return params.value > 0 ? `${this.VaP}\n\n(${this.VaPNum})` : '';
+            }
+          }
+        }];
 
         this.sum = this.numberWithComma.transform(this.total);
         this.progressInfoData[0].value = this.sum;
@@ -156,74 +331,184 @@ export class VivaerosDashboardComponent implements OnDestroy {
     return oneWeekAgoDate;
   }
 
+  GetLastMonthDate(date: Date): Date {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+
+    // handle special case for January
+    if (month === 0) {
+      return new Date(year - 1, 11, date.getDate());
+    }
+
+    // handle special case for February
+    if (month === 1) {
+      const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+      const lastDayOfMonth = isLeapYear ? 29 : 28;
+      const lastMonth = new Date(year, month - 1, lastDayOfMonth);
+      const lastMonthDay = Math.min(date.getDate(), lastDayOfMonth);
+      return new Date(year, month - 1, lastMonthDay);
+    }
+
+    // handle other months
+    const lastMonth = new Date(year, month - 1, 1);
+    const lastDayOfMonth = new Date(year, month, 0).getDate();
+    const lastMonthDay = Math.min(date.getDate(), lastDayOfMonth);
+    return new Date(year, month - 1, lastMonthDay);
+  }
+
+  GetBeginningOfMonth(date: Date): Date {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    return new Date(year, month, 1);
+  }
+
   async GetWeekAgoOrders() {
-    let startOfToday: Date = this.GetDateOneWeekAgo();
+    let startOfToday: Date = this.GetLastMonthDate(new Date());
     startOfToday.setHours(0, 0, 0, 0);
 
-    let endOfToday: Date = this.GetDateOneWeekAgo();
+    let endOfToday: Date = this.GetLastMonthDate(new Date());
     endOfToday.setHours(23, 59, 59, 999);
 
     const startOfTodayFormatted = startOfToday.toLocaleString('en-US', VivaerosDashboardComponent.options);
     const endOfTodayFormatted = endOfToday.toLocaleString('en-US', VivaerosDashboardComponent.options);
     let page = 1;
-    this.GetAWeekAgoData(startOfTodayFormatted, endOfTodayFormatted, page);
+    this.customTotal = 0;
+    this.weekAgoTotal = await this.GetPastData(startOfTodayFormatted, endOfTodayFormatted, page, 'week');
+
+    if(this.total < this.weekAgoTotal) {
+      this.compareStr = 'Lesser';
+      this.percentageIncrease = ((this.weekAgoTotal - this.total) / this.weekAgoTotal ) * 100;
+    } else {
+        this.compareStr = 'Better';
+        this.percentageIncrease = ((this.total - this.weekAgoTotal) / this.weekAgoTotal ) * 100;
+    }
+
+    this.percentageIncrease = Math.abs(Math.round(this.percentageIncrease));
+
+    this.GetMonthlyOrder();
   }
 
-  GetAWeekAgoData(startOfTodayFormatted, endOfTodayFormatted, page) {
-    this.VivaerosService.getOrderData(startOfTodayFormatted, endOfTodayFormatted, page).then(order => order.subscribe(
-      (data:any) => {
-        if(data['Data'].length != 0) {
+  async GetMonthlyOrder() {
+    const startOfToday: Date = this.GetBeginningOfMonth(new Date());
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const endOfToday: Date = new Date();
+    endOfToday.setHours(23, 59, 59, 999);
+
+    const startOfTodayFormatted = startOfToday.toLocaleString('en-US', VivaerosDashboardComponent.options);
+    const endOfTodayFormatted = endOfToday.toLocaleString('en-US', VivaerosDashboardComponent.options);
+    let page = 1;
+    this.customTotal = 0;
+
+    this.monthlyTotal = await this.GetPastData(startOfTodayFormatted, endOfTodayFormatted, page, 'month');
+  }
+
+  async GetPastData(startOfTodayFormatted, endOfTodayFormatted, page, criteria): Promise<number> {
+    return new Promise(async (resolve) => {
+      const order = await this.VivaerosService.getOrderData(startOfTodayFormatted, endOfTodayFormatted, page);
+      order.subscribe((data: any) => {
+        if (data['Data'].length != 0) {
           let orderData = data['Data'];
           orderData.forEach(order => {
-            this.weekAgoTotal += (order['TotalCost'] - order['ShippingCost']);
+            this.customTotal += (order['TotalCost'] - order['ShippingCost']);
           });
 
-          if(data['Paging']['TotalPages'] > 1 && page < data['Paging']['TotalPages']) {
+          if (data['Paging']['TotalPages'] > 1 && page < data['Paging']['TotalPages']) {
             page++;
-            this.GetAWeekAgoData(startOfTodayFormatted, endOfTodayFormatted, page);
+            this.GetPastData(startOfTodayFormatted, endOfTodayFormatted, page, criteria);
           }
 
-          if(this.total < this.weekAgoTotal) {
-              this.compareStr = 'Lesser';
-              this.percentageIncrease = ((this.weekAgoTotal - this.total) / this.weekAgoTotal ) * 100;
-          } else {
-              this.compareStr = 'Better';
-              this.percentageIncrease = ((this.total - this.weekAgoTotal) / this.weekAgoTotal ) * 100;
+          if (criteria == 'week') {
+            this.weekAgoTotal = this.customTotal;
+          } else if(criteria == 'month') {
+            this.monthlyTotal  = this.customTotal;
+            this.forecast = this.Forecast(this.monthlyTotal, new Date());
           }
-
-          this.percentageIncrease = Math.abs(Math.round(this.percentageIncrease));
-
-          this.forecast = this.ForecastMonthlyProfit(this.total, this.weekAgoTotal, new Date());
+          resolve(this.customTotal);
+        } else {
+          resolve(0);
         }
-      }));
+      });
+    });
   }
 
-  ForecastMonthlyProfit(currentDailyProfit: number, profitOneWeekAgo: number, currentDate: Date): number {
+
+
+  Forecast(totalOrderValueCurrentMonth: number, currentDate: Date): number {
+    // Get the current day of the month
+    const currentDay = currentDate.getDate();
+
+    // Get the total number of days in the current month
     const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
 
-    // Calculate the total profit from the current day until the end of the week
-    const daysInWeek = 7 - (currentDate.getDay() + 6) % 7; // Calculate the number of days until the end of the week (Sunday)
-    const remainingProfit = daysInWeek * currentDailyProfit;
+    // Calculate the average daily sales for the current month until today
+    const averageDailySales = totalOrderValueCurrentMonth / currentDay;
 
-    // Estimate the total profit for the current week based on the profit from one day a week ago
-    const profitFromOneDayAgo = profitOneWeekAgo / daysInWeek;
-    const dailyProfitsLastWeek = [profitFromOneDayAgo, /* insert daily profits for last 6 days here */];
-    const totalProfitLastWeek = dailyProfitsLastWeek.reduce((acc, cur) => acc + cur, 0);
-    const averageDailyProfitLastWeek = totalProfitLastWeek / 7;
-    const totalForecastedProfitThisWeek = averageDailyProfitLastWeek * daysInWeek;
+    // Estimate the remaining days in the month
+    const remainingDays = daysInMonth - currentDay;
 
-    // Calculate the average daily profit for the month so far, excluding the current week
-    const daysInMonthSoFar = currentDate.getDate() - daysInWeek;
-    const totalProfitSoFar = (daysInMonthSoFar * currentDailyProfit) + totalForecastedProfitThisWeek;
-    const averageDailyProfitSoFar = totalProfitSoFar / daysInMonthSoFar;
+    // Calculate the projected sales for the remaining days
+    const projectedSales = averageDailySales * remainingDays;
 
-    // Extrapolate the average daily profit to estimate the remaining profit for the month
-    const remainingDays = daysInMonth - daysInMonthSoFar - daysInWeek;
-    const estimatedRemainingProfit = remainingDays * averageDailyProfitSoFar;
+    // Calculate the forecast for the total sales by the end of the month
+    const forecast = totalOrderValueCurrentMonth + projectedSales;
 
-    // Add up the total profit from the current week and the estimated remaining profit
-    const totalForecastedProfit = Math.abs(Math.round(totalForecastedProfitThisWeek + estimatedRemainingProfit));
+    return forecast;
+}
 
-    return totalForecastedProfit;
+  GetGoogleCountriesData() {
+    this.VivaerosService.getCountries().then(order => order.subscribe(
+      (data:any) => {
+        if(data['rows'].length != 0) {
+          this.activeUsersByCountry = data.rows.map(row => {
+            return {
+              country: row.dimensionValues[0].value,
+              activeUsers: row.metricValues[0].value
+            }
+          });
+
+          this.ranking =[];
+
+          this.activeUsersByCountry.sort((a, b) => b.activeUsers - a.activeUsers);
+          this.activeUsersByCountry = this.activeUsersByCountry.slice(0, 5);
+
+          this.activeUsersByCountry.forEach(item => {
+            this.ranking.push(item.country.value);
+          });
+        }
+      }
+    ));
   }
+
+  GetGoogleDeviceCategory() {
+    this.VivaerosService.getDeviceCategories().then(order => order.subscribe(
+      (data:any) => {
+        if(data['rows'].length != 0) {
+          this.activeUsersByDevice = data.rows.map(row => {
+            return {
+              device: row.dimensionValues[0].value,
+              activeUsers: row.metricValues[0].value
+            }
+          });
+          this.activeUsersByDevice.sort((a,b) => b.activeUsers - a.activeUsers);
+          console.log(this.activeUsersByDevice);
+        }
+      }
+    ));
+  }
+
+  /**
+   * Initializes the Configdata and set a timer to fetch the data every few seconds, which is set as a configuration variable
+   */
+  InitiateConfigData() {
+
+    //TODO: Exclude Weekends
+    setInterval(() => {
+      this.total = 0;
+      this.GetOrderData();
+      this.GetGoogleCountriesData();
+      this.GetGoogleDeviceCategory();
+      }, 1800000);
+  }
+
 }

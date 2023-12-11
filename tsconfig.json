@@ -1,5 +1,8 @@
 {
   "compileOnSave": false,
+  "angularCompilerOptions": {
+    "types" : ["node"]
+  },
   "compilerOptions": {
     "importHelpers": true,
     "module": "es2020",
@@ -8,6 +11,8 @@
     "declaration": false,
     "moduleResolution": "node",
     "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
     "target": "es2020",
     "typeRoots": [
       "node_modules/@types"
@@ -18,6 +23,14 @@
     ],
     "plugins": [
       { "name": "tslint-language-service"}
-    ]
+    ],
+    "paths" : {
+      "crypto": ["./node_modules/crypto-browserify"],
+      "stream": ["./node_modules/stream-browserify"],
+      "assert": ["./node_modules/assert"],
+      "http": ["./node_modules/stream-http"],
+      "https": ["./node_modules/https-browserify"],
+      "os": ["./node_modules/os-browserify"],
+    }
   }
 }

@@ -4,6 +4,7 @@ import { Injectable } from "@angular/core";
 @Injectable({   providedIn: 'root' })
 export class VivaerosService {
   public static url = 'http://localhost:8080/https://app.billbee.io';
+  public static googleUrl = 'http://googlelb-1211007039.us-east-1.elb.amazonaws.com/api/ga4-data';
 
   constructor(private http: HttpClient) {}
 
@@ -24,4 +25,11 @@ export class VivaerosService {
     });
   }
 
+  async getCountries() {
+    return this.http.get(VivaerosService.googleUrl+'?startDate=7daysAgo&endDate=today&dimensions=country');
+  }
+
+  async getDeviceCategories() {
+    return this.http.get(VivaerosService.googleUrl+'?startDate=7daysAgo&endDate=today&dimensions=deviceCategory');
+  }
 }

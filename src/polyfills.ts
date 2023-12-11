@@ -18,6 +18,9 @@
 * BROWSER POLYFILLS
 */
 
+(window as any).global = window;
+global.Buffer = global.Buffer || require('buffer').Buffer;
+global.process = require('process');
 
 /** IE10 and IE11 requires the following for NgClass support on SVG elements */
 import 'classlist.js';  // Run `npm install --save classlist.js`.
@@ -51,6 +54,7 @@ import 'zone.js';  // Included with Angular CLI.
  */
 import 'core-js/es7/array';
 import 'core-js/es7/object';
+import 'util/util.js';
 
 if (typeof SVGElement.prototype.contains === 'undefined') {
   SVGElement.prototype.contains = HTMLDivElement.prototype.contains;
