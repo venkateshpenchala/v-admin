@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 
 @Injectable({   providedIn: 'root' })
 export class VivaerosService {
-  public static url = 'http://localhost:8080/https://app.billbee.io';
+  public static url = 'https://hogkdf0qsh.execute-api.us-east-1.amazonaws.com/default/getBillbee';
   public static googleUrl = 'http://googlelb-1211007039.us-east-1.elb.amazonaws.com/api/ga4-data';
 
   constructor(private http: HttpClient) {}
@@ -13,16 +13,7 @@ export class VivaerosService {
   }
 
   async get(start: string, end: string, page: number) {
-    const headers = new HttpHeaders({
-      Authorization: 'Basic ' + btoa('g.lenssen@vivaeros.com:MLVXeTebUx5DaX3'),
-      'Access-Conttrol-Allow-Origin': '*',
-      Accept: 'application/json',
-      'X-Billbee-Api-Key': '204B947D-8646-46E7-A8CF-BFEBCB3CAEAB'
-    });
-
-    return this.http.get(VivaerosService.url+'/api/v1/orders?minOrderDate='+start+'&maxOrderDate='+end+'&page='+page, {
-      headers: headers
-    });
+    return this.http.get(VivaerosService.url+'?minOrderDate='+start+'&maxOrderDate='+end+'&page='+page);
   }
 
   async getCountries() {

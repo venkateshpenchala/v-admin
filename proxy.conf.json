@@ -1,0 +1,11 @@
+{
+  "/": {
+    "target": "http://googlelb-1211007039.us-east-1.elb.amazonaws.com/",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "headers": {
+      "Host": "googlelb-1211007039.us-east-1.elb.amazonaws.com/"
+    }
+  }
+}
