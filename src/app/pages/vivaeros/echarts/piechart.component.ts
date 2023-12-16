@@ -72,7 +72,39 @@ export class VivaerosPieComponent implements AfterViewInit, OnDestroy {
               formatter: () => {
                 return this.sum+ '€'; // Use sum variable here
               },
-              color: echarts.textColor
+              color: echarts.textColor,
+              textStyle: {
+                fontSize: 80,
+                fontWeight: 'bold',
+                rich: {
+                  normal: {
+                    fontSize: 80
+                  },
+                  mobile: {
+                    fontSize: 40 // Adjust the font size for mobile devices
+                  }
+                },
+                mediaQuery: [
+                  {
+                    query: {
+                      maxWidth: 600 // Set the maximum width for mobile devices
+                    },
+                    option: {
+                      textStyle: {
+                        fontSize: 40,
+                        rich: {
+                          normal: {
+                            fontSize: 40
+                          },
+                          mobile: {
+                            fontSize: 20 // Adjust the font size for mobile devices
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
             },
             emphasis: {
               label: {
