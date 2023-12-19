@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, Input, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { NbThemeService } from '@nebular/theme';
 import * as echarts from 'echarts';
-import { Vivaeros } from '../models/vivaeros';
 
 @Component({
   selector: 'echarts-pie',
@@ -16,11 +15,32 @@ export class VivaerosPieComponent implements AfterViewInit, OnDestroy {
   myChart: echarts.ECharts;
 
   constructor(private theme: NbThemeService) {
+    this.theme.onMediaQueryChange().subscribe(value => {
+      const currentWidth = value[1].width;
+      if (currentWidth >= 1200) {
+        this.isMobileView = false;
+        this.fontSize = '80';
+        this.arrowHeight = 100;
+        this.arrowWidth = 100;
+        this.arrowTop = '400';
+      } else {
+        this.isMobileView = true;
+        this.fontSize = '40';
+        this.arrowHeight = 50;
+        this.arrowWidth = 50;
+        this.arrowTop = '370';
+      }
+    });
   }
 
   @Input() sum:number;
   @Input() chartData;
   @Input() status;
+  isMobileView: boolean;
+  fontSize: string;
+  arrowWidth: number;
+  arrowHeight: number;
+  arrowTop: string;
 
   ngAfterViewInit() {
     let chartElement = document.getElementById('pieChart');
@@ -67,44 +87,12 @@ export class VivaerosPieComponent implements AfterViewInit, OnDestroy {
             label: {
               show: true,
               position: 'center',
-              fontSize: '80',
-              fontWeight:'bold',
+              fontSize: this.fontSize,
+              fontWeight: 'bold',
               formatter: () => {
-                return this.sum+ '€'; // Use sum variable here
+                return this.sum + '€'; // Use sum variable here
               },
-              color: echarts.textColor,
-              textStyle: {
-                fontSize: 80,
-                fontWeight: 'bold',
-                rich: {
-                  normal: {
-                    fontSize: 80
-                  },
-                  mobile: {
-                    fontSize: 40 // Adjust the font size for mobile devices
-                  }
-                },
-                mediaQuery: [
-                  {
-                    query: {
-                      maxWidth: 600 // Set the maximum width for mobile devices
-                    },
-                    option: {
-                      textStyle: {
-                        fontSize: 40,
-                        rich: {
-                          normal: {
-                            fontSize: 40
-                          },
-                          mobile: {
-                            fontSize: 20 // Adjust the font size for mobile devices
-                          }
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
+              color: echarts.textColor
             },
             emphasis: {
               label: {
@@ -112,8 +100,8 @@ export class VivaerosPieComponent implements AfterViewInit, OnDestroy {
                 fontSize: 40,
                 fontWeight: 'bold'
               }
-            },
-          },
+            }
+          }
         ]
       };
     });
@@ -143,14 +131,14 @@ export class VivaerosPieComponent implements AfterViewInit, OnDestroy {
           type: 'image',
           id: 'logo',
           left: 'center',
-          top: '400',
+          top: '370',
           z: 10,
           bounding: 'raw',
           origin: [0, 75],
           style: {
             image: imgSrc, // your image or icon URL here
-            width: 100,
-            height: 100
+            width: this.arrowWidth,
+            height: this.arrowHeight
           }
         }
       }, false);
