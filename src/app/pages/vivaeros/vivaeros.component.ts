@@ -173,6 +173,7 @@ export class VivaerosDashboardComponent implements OnDestroy {
       (data:any) => {
         if(data['Data'].length != 0) {
           let orderData = data['Data'];
+          orderData = orderData.filter(order => order['State'] !== 5 && order['State'] !== 6 && order['State'] !== 8 && order['State'] !== 14);
           this.VaMNum = 0;
           this.VaONum = 0;
           this.VaPNum = 0;
@@ -409,6 +410,7 @@ export class VivaerosDashboardComponent implements OnDestroy {
       order.subscribe((data: any) => {
         if (data['Data'].length != 0) {
           let orderData = data['Data'];
+          orderData = orderData.filter(order => order['State'] !== 5 && order['State'] !== 6 && order['State'] !== 8 && order['State'] !== 14);
           orderData.forEach(order => {
             this.customTotal += (order['TotalCost'] - order['ShippingCost']);
           });
